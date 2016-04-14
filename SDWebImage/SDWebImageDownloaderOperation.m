@@ -192,9 +192,6 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
     self.connection = nil;
     self.imageData = nil;
     self.thread = nil;
-    self.width = 0;
-    self.height = 0;
-    self.isProgressive = NO;
 }
 
 - (void)setFinished:(BOOL)finished {
