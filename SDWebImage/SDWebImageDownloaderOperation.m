@@ -39,6 +39,7 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
     size_t width, height;
     UIImageOrientation orientation;
     BOOL responseFromCached;
+    BOOL isProgressive;
 }
 
 @synthesize executing = _executing;
@@ -191,6 +192,9 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
     self.connection = nil;
     self.imageData = nil;
     self.thread = nil;
+    self.width = 0;
+    self.height = 0;
+    self.isProgressive = NO;
 }
 
 - (void)setFinished:(BOOL)finished {
@@ -265,25 +269,30 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
         if (width + height == 0) {
             CFDictionaryRef properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, NULL);
             if (properties) {
-                NSInteger orientationValue = -1;
-                CFTypeRef val = CFDictionaryGetValue(properties, kCGImagePropertyPixelHeight);
-                if (val) CFNumberGetValue(val, kCFNumberLongType, &height);
-                val = CFDictionaryGetValue(properties, kCGImagePropertyPixelWidth);
-                if (val) CFNumberGetValue(val, kCFNumberLongType, &width);
-                val = CFDictionaryGetValue(properties, kCGImagePropertyOrientation);
-                if (val) CFNumberGetValue(val, kCFNumberNSIntegerType, &orientationValue);
-                CFRelease(properties);
-
-                // When we draw to Core Graphics, we lose orientation information,
-                // which means the image below born of initWithCGIImage will be
-                // oriented incorrectly sometimes. (Unlike the image born of initWithData
-                // in connectionDidFinishLoading.) So save it here and pass it on later.
-                orientation = [[self class] orientationFromPropertyValue:(orientationValue == -1 ? 1 : orientationValue)];
+                // verify that this is actually a progressive JFIF!
+                CFTypeRef val = CFDictionaryGetValue(properties, kCGImagePropertyJFIFIsProgressive);
+                if (val) isProgressive = YES;
+                if (isProgressive) {
+                    NSInteger orientationValue = -1;
+                    val = CFDictionaryGetValue(properties, kCGImagePropertyPixelHeight);
+                    if (val) CFNumberGetValue(val, kCFNumberLongType, &height);
+                    val = CFDictionaryGetValue(properties, kCGImagePropertyPixelWidth);
+                    if (val) CFNumberGetValue(val, kCFNumberLongType, &width);
+                    val = CFDictionaryGetValue(properties, kCGImagePropertyOrientation);
+                    if (val) CFNumberGetValue(val, kCFNumberNSIntegerType, &orientationValue);
+                    CFRelease(properties);
+                    
+                    // When we draw to Core Graphics, we lose orientation information,
+                    // which means the image below born of initWithCGIImage will be
+                    // oriented incorrectly sometimes. (Unlike the image born of initWithData
+                    // in connectionDidFinishLoading.) So save it here and pass it on later.
+                    orientation = [[self class] orientationFromPropertyValue:(orientationValue == -1 ? 1 : orientationValue)];
+                }
             }
 
         }
 
-        if (width + height > 0 && totalSize < self.expectedSize) {
+        if (width + height > 0 && totalSize < self.expectedSize && isProgressive) {
             // Create the image
             CGImageRef partialImageRef = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
 
