@@ -39,7 +39,7 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
     size_t width, height;
     UIImageOrientation orientation;
     BOOL responseFromCached;
-    BOOL isProgressive;
+    BOOL isProgressive = NO;
 }
 
 @synthesize executing = _executing;
@@ -192,6 +192,9 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
     self.connection = nil;
     self.imageData = nil;
     self.thread = nil;
+    width = 0;
+    height = 0;
+    isProgressive = NO;
 }
 
 - (void)setFinished:(BOOL)finished {
