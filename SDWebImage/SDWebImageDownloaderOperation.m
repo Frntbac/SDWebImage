@@ -39,7 +39,7 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
     size_t width, height;
     UIImageOrientation orientation;
     BOOL responseFromCached;
-    BOOL isProgressive = NO;
+    BOOL isProgressive;
 }
 
 @synthesize executing = _executing;
@@ -62,6 +62,7 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
         _finished = NO;
         _expectedSize = 0;
         responseFromCached = YES; // Initially wrong until `connection:willCacheResponse:` is called or not called
+        isProgressive = NO;
     }
     return self;
 }
