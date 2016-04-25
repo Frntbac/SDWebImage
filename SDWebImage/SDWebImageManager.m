@@ -138,7 +138,7 @@
             NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorFileDoesNotExist userInfo:nil];
             completedBlock(nil, error, SDImageCacheTypeNone, YES, url);
         });
-        return operation;
+        return nil;
     }
 
     @synchronized (self.runningOperations) {
@@ -290,7 +290,8 @@
         }
     }];
 
-    return operation;
+    //if there is no cache operaton, operation is useless and therefore should not be returned
+    return operation.cacheOperation ? operation : nil;
 }
 
 - (void)saveImageToCache:(UIImage *)image forURL:(NSURL *)url {
