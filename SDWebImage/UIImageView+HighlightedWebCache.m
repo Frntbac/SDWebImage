@@ -53,7 +53,9 @@
                                          }
                                      });
         }];
-        [self sd_setImageLoadOperation:operation forKey:UIImageViewHighlightedWebCacheOperationKey];
+        if (operation) {
+            [self sd_setImageLoadOperation:operation forKey:UIImageViewHighlightedWebCacheOperationKey];
+        }
     } else {
         dispatch_main_async_safe(^{
             NSError *error = [NSError errorWithDomain:SDWebImageErrorDomain code:-1 userInfo:@{NSLocalizedDescriptionKey : @"Trying to load a nil url"}];
