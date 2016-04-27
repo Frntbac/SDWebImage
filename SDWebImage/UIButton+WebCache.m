@@ -87,7 +87,9 @@ static char imageURLStorageKey;
             }
         });
     }];
-    [self sd_setImageLoadOperation:operation forState:state];
+    if (operation) {
+        [self sd_setImageLoadOperation:operation forState:state];
+    }
 }
 
 - (void)sd_setBackgroundImageWithURL:(NSURL *)url forState:(UIControlState)state {
@@ -135,7 +137,9 @@ static char imageURLStorageKey;
                 }
             });
         }];
-        [self sd_setBackgroundImageLoadOperation:operation forState:state];
+        if (operation) {
+            [self sd_setBackgroundImageLoadOperation:operation forState:state];
+        }
     } else {
         dispatch_main_async_safe(^{
             NSError *error = [NSError errorWithDomain:SDWebImageErrorDomain code:-1 userInfo:@{NSLocalizedDescriptionKey : @"Trying to load a nil url"}];
