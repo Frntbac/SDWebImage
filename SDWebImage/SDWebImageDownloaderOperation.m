@@ -230,9 +230,9 @@ typedef NSMutableDictionary<NSString *, id> SDCallbacksDictionary;
     });
     self.dataTask = nil;
     self.imageData = nil;
-    self.width = 0;
-    self.height = 0;
-    self.isProgressive = NO;
+    width = 0;
+    height = 0;
+    isProgressive = NO;
     if (self.ownedSession) {
         [self.ownedSession invalidateAndCancel];
         self.ownedSession = nil;
